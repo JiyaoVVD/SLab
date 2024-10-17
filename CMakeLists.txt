@@ -4,7 +4,8 @@ project(slab)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-Set(EasyX_ROOT "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/VS")
+#Set(EasyX_ROOT "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/VS")
+set(EasyX_ROOT "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/VS")
 Set(EasyX_INCLUDE "${EasyX_ROOT}/include")
 Set(EasyX_LIB "${EasyX_ROOT}/lib/x64")
 
