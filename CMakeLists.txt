@@ -11,9 +11,8 @@ Set(EasyX_LIB "${EasyX_ROOT}/lib/x64")
 include_directories(${EasyX_INCLUDE})
 link_directories(${EasyX_LIB})
 
-add_subdirectory(math_utils)
+add_executable(slab main.cpp)
 
-add_executable(slab WIN32 main.cpp)
-
-target_link_libraries(slab math_utils)
 target_link_libraries(slab EasyXa EasyXw)
+target_include_directories(slab PRIVATE ${CMAKE_SOURCE_DIR}/3rdParty/glm)
+target_include_directories(slab PRIVATE ${CMAKE_SOURCE_DIR}/3rdParty/glm/gtc)
