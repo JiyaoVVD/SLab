@@ -32,6 +32,11 @@ FrameBuffer& CreateFrameBuffer(unsigned width, unsigned height){
     return *frameBuffer;
 }
 
+
+void ReleaseFrameBuffer(FrameBuffer* frameBuffer){
+    delete frameBuffer->buffer;
+    delete frameBuffer;
+}
  
 void RenderFrameBuffer(FrameBuffer& frameBuffer){
     for(int i = 0; i < frameBuffer.height; i++){
@@ -47,26 +52,22 @@ struct SwapFrameBuffer{
 };
 
 
-void DrawLine(FrameBuffer &frameBufer, const glm::ivec2& sPos, const glm::ivec2& ePos, const Color& color){
-
-}
-
-
-void DrawLine(FrameBuffer &frameBuffer, int x0, int y0, int x1, int y1, Color color){
-    for (float t = 0; t < 1.; t += .1){
-        int x = int(x0 * (1.f - t) + x1 * t);
-        int y = int(y0 * (1.f - t) + y1 * t);
-        frameBuffer.buffer[x * frameBuffer.width + y] = color;
-        
-    }
-}
-
-void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const Color& color){
+void DrawLine(FrameBuffer &frameBuffer, const glm::ivec2& p1, const glm::ivec2& p2, const Color& color){
     float k = (float)(p2.y - p1.y) / (float)(p2.x - p1.x);
-    for(int i = p1.x; i <= p2.x; ++i){
-        int y = (int)(k * (i - p1.x) + p1.y);
-        putpixel(i, y, color);
+    for(int x = p1.x; x <= p2.x; ++x){
+        int y = (int)(k * (x - p1.x) + p1.y);
+        frameBuffer.buffer[y * frameBuffer.width + x] = color;
     }
+}
+
+
+void DrawPixel(FrameBuffer &frameBuffer, const glm::ivec2& p1, const Color& color){
+    frameBuffer.buffer[p1.y * frameBuffer.width + p1.x] = color;
+}
+
+
+void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p1, const glm::ivec2 p2, const glm::ivec2 p3, const Color& color){
+
 }
 
 
@@ -74,12 +75,16 @@ int main(){
     // EasyX's init function
     initgraph(WIDTH, HEIGHT, EW_SHOWCONSOLE | EW_DBLCLKS);
 
+    FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
+
     // receive keyboard event and exit
     while(!_kbhit()){
-        DrawLine(glm::ivec2(100, 100), glm::ivec2(200, 200), Color(0xFFFFFF));
+        DrawLine(frameBuffer, glm::ivec2(100, 100), glm::ivec2(400, 300), Color(0xFFFFFF));
+        RenderFrameBuffer(frameBuffer);
         Sleep(20);
     }
 
+    ReleaseFrameBuffer(&frameBuffer);
     // close EasyX
     closegraph();
     return 0;
