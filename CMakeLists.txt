@@ -9,6 +9,14 @@ Set(EasyX_ROOT "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxil
 Set(EasyX_INCLUDE "${EasyX_ROOT}/include")
 Set(EasyX_LIB "${EasyX_ROOT}/lib/x64")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
+#find_package(TBB REQUIRED)
+
+include(cmake/common.cmake)
+
+set_common_project_settings(tbb)
+
 include_directories(${EasyX_INCLUDE})
 link_directories(${EasyX_LIB})
 
@@ -18,5 +26,8 @@ add_executable(slab main.cpp
         stype.h)
 
 target_link_libraries(slab EasyXa EasyXw)
+target_link_libraries(slab TBB::tbb Threads::Threads)
 target_include_directories(slab PRIVATE ${CMAKE_SOURCE_DIR}/3rdParty/glm)
 target_include_directories(slab PRIVATE ${CMAKE_SOURCE_DIR}/3rdParty/glm/gtc)
+
+target_compile_options(slab PRIVATE ${TBB_CXX_STD_FLAG})

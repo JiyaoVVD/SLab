@@ -7,11 +7,15 @@
 #include <iostream>
 #include <glm.hpp>
 #include <conio.h>
+#include <cstdlib>
+#include <oneapi/tbb.h>
+#include <oneapi/tbb/parallel_for.h>
+#include <chrono>
 
 #include "stype.h"
 
-#define WIDTH 640
-#define HEIGHT 640
+#define WIDTH 400LL
+#define HEIGHT 400LL
 
 
 struct FrameBuffer{
@@ -37,12 +41,33 @@ void ReleaseFrameBuffer(FrameBuffer* frameBuffer){
     delete frameBuffer;
 }
 
-void RenderFrameBuffer(FrameBuffer& frameBuffer){
+
+void RenderFrameBuffer(const FrameBuffer& frameBuffer){
+    auto start = std::chrono::high_resolution_clock::now();
+
+    tbb::parallel_for(
+        size_t(0), size_t(frameBuffer.width), [=](size_t i) {
+            for(int j = 0; j < frameBuffer.width; j++){
+                putpixel(j, i, frameBuffer.buffer[i * frameBuffer.width + j]);
+            }
+        }
+    );
+
     for(int i = 0; i < frameBuffer.height; i++){
         for(int j = 0; j < frameBuffer.width; j++){
             putpixel(j, i, frameBuffer.buffer[i * frameBuffer.width + j]);
         }
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Time cost current frame: " << duration.count() << " seconds" << std::endl;
+}
+
+
+void ClearFrameBuffer(FrameBuffer& frameBuffer, const HEX_COLOR& color){
+    memset(frameBuffer.buffer, color, sizeof(HEX_COLOR) * frameBuffer.width * frameBuffer.height);
 }
 
 
@@ -85,10 +110,10 @@ void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p0, const glm::ivec
             auto crs0 = icross2(p1 - p0, point - p0);
             auto crs1 = icross2(p2 - p1, point - p1);
             auto crs2 = icross2(p0 - p2, point - p2);
-            if(crs0 * crs1 >= 0 && crs1 * crs2 >= 0 && crs0 * crs2 >= 0)
+            if(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 ||
+                crs0 <= 0 && crs1 <= 0 && crs2 <= 0)
             {
-                // std::cout << x << ',' << y << std::endl;
-                frameBuffer.buffer[y * frameBuffer.width + x] = color;
+                 frameBuffer.buffer[y * frameBuffer.width + x] = color;
             }
         }
     }
@@ -97,16 +122,14 @@ void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p0, const glm::ivec
 
 int main(){
     // EasyX's init function
+    FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
+    // ClearFrameBuffer(frameBuffer, RGB_TO_HEX_COLOR(255, 0, 0));
+    DrawTriangle(frameBuffer, glm::ivec2(0, 0), glm::ivec2(0, HEIGHT-1), glm::ivec2(WIDTH-1, HEIGHT-1), RGB_TO_HEX_COLOR(255, 0, 0));
     initgraph(WIDTH, HEIGHT, EW_SHOWCONSOLE | EW_DBLCLKS);
 
-    FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
 
     // receive keyboard event and exit
-//    DrawTriangle(frameBuffer, glm::ivec2(0, 0), glm::ivec2(WIDTH, 0), glm::ivec2(WIDTH, HEIGHT), RGB_TO_HEX_COLOR(0, 0, 255));
-//    DrawTriangle(frameBuffer, glm::ivec2(0, 0), glm::ivec2(0, HEIGHT), glm::ivec2(WIDTH, HEIGHT), RGB_TO_HEX_COLOR(255, 0, 0));
     while(!_kbhit()){
-        DrawLine(frameBuffer, glm::ivec2(0, 0), glm::ivec2(WIDTH, HEIGHT), RGB_TO_HEX_COLOR(255, 255, 255));
-        DrawLine(frameBuffer, glm::ivec2(0, HEIGHT), glm::ivec2(WIDTH, 0), RGB_TO_HEX_COLOR(255, 255, 255));
         RenderFrameBuffer(frameBuffer);
         Sleep(20);
     }
