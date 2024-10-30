@@ -120,21 +120,54 @@ void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p0, const glm::ivec
 
 
 int main(){
-    // EasyX's init function
-    FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
-    // ClearFrameBuffer(frameBuffer, RGB_TO_HEX_COLOR(255, 0, 0));
-    DrawTriangle(frameBuffer, glm::ivec2(0, 0), glm::ivec2(0, HEIGHT-1), glm::ivec2(WIDTH-1, HEIGHT-1), RGB_TO_HEX_COLOR(255, 0, 0));
-    initgraph(WIDTH, HEIGHT, EW_SHOWCONSOLE | EW_DBLCLKS);
-
-
-    // receive keyboard event and exit
-    while(!_kbhit()){
-        RenderFrameBuffer(frameBuffer);
-        Sleep(20);
+    if(!glfwInit()){
+        std::cerr << "Failed to initialize GLFW" << std::endl;
+        return -1;
     }
 
-    ReleaseFrameBuffer(&frameBuffer);
-    // close EasyX
-    closegraph();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "SLab", NULL, NULL);
+    if(!window){
+        std::cerr << "Failed to create GLFW window." << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+
+    glViewport(0, 0, WIDTH, HEIGHT);
+    glEnable(GL_DEPTH_TEST);
+
+    while(!glfwWindowShouldClose(window)){
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
     return 0;
 }
+
+
+//int main(){
+//    // EasyX's init function
+//    FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
+//    // ClearFrameBuffer(frameBuffer, RGB_TO_HEX_COLOR(255, 0, 0));
+//    DrawTriangle(frameBuffer, glm::ivec2(0, 0), glm::ivec2(0, HEIGHT-1), glm::ivec2(WIDTH-1, HEIGHT-1), RGB_TO_HEX_COLOR(255, 0, 0));
+//    initgraph(WIDTH, HEIGHT, EW_SHOWCONSOLE | EW_DBLCLKS);
+//
+//
+//    // receive keyboard event and exit
+//    while(!_kbhit()){
+//        RenderFrameBuffer(frameBuffer);
+//        Sleep(20);
+//    }
+//
+//    ReleaseFrameBuffer(&frameBuffer);
+//    // close EasyX
+//    closegraph();
+//    return 0;
+//}
