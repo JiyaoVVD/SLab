@@ -7,10 +7,9 @@
 #include <iostream>
 #include <glm.hpp>
 #include <conio.h>
-#include <cstdlib>
-#include <oneapi/tbb.h>
 #include <oneapi/tbb/parallel_for.h>
 #include <chrono>
+#include <GLFW/glfw3.h>
 
 #include "stype.h"
 
