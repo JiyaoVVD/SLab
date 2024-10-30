@@ -10,6 +10,7 @@
 #include <oneapi/tbb/parallel_for.h>
 #include <chrono>
 #include <GLFW/glfw3.h>
+#include <algorithm>
 
 #include "stype.h"
 
@@ -20,12 +21,12 @@
 struct FrameBuffer{
     unsigned width;
     unsigned height;
-    HEX_COLOR *buffer;
+    unsigned char *buffer;
 };
 
 
 FrameBuffer& CreateFrameBuffer(unsigned width, unsigned height){
-    auto *buffer = new HEX_COLOR[width * height]{0};
+    auto *buffer = new unsigned char[width * height * 3]{0};
     auto *frameBuffer = new FrameBuffer{
             width,
             height,
@@ -42,31 +43,22 @@ void ReleaseFrameBuffer(FrameBuffer* frameBuffer){
 
 
 void RenderFrameBuffer(const FrameBuffer& frameBuffer){
-    auto start = std::chrono::high_resolution_clock::now();
-
-    tbb::parallel_for(
-        size_t(0), size_t(frameBuffer.width), [=](size_t i) {
-            for(int j = 0; j < frameBuffer.width; j++){
-                putpixel(j, i, frameBuffer.buffer[i * frameBuffer.width + j]);
-            }
-        }
-    );
-
-    for(int i = 0; i < frameBuffer.height; i++){
-        for(int j = 0; j < frameBuffer.width; j++){
-            putpixel(j, i, frameBuffer.buffer[i * frameBuffer.width + j]);
-        }
-    }
-
-    auto end = std::chrono::high_resolution_clock::now();
-
-    std::chrono::duration<double> duration = end - start;
-    std::cout << "Time cost current frame: " << duration.count() << " seconds" << std::endl;
+//    for(int i = 0; i < frameBuffer.height; i++){
+//        for(int j = 0; j < frameBuffer.width; j++){
+//            putpixel(j, i, frameBuffer.buffer[i * frameBuffer.width + j]);
+//        }
+//    }
+    glRasterPos2i(0, 0);
+    glDrawPixels(frameBuffer.width, frameBuffer.height, GL_RGB, GL_UNSIGNED_BYTE, frameBuffer.buffer);
 }
 
 
-void ClearFrameBuffer(FrameBuffer& frameBuffer, const HEX_COLOR& color){
-    memset(frameBuffer.buffer, color, sizeof(HEX_COLOR) * frameBuffer.width * frameBuffer.height);
+void ClearFrameBuffer(FrameBuffer& frameBuffer, const SNormColor3& color){
+    for(auto i = 0; i < frameBuffer.width * frameBuffer.height; ++i){
+        *(frameBuffer.buffer + i * 3) = color.r;
+        *(frameBuffer.buffer + i * 3 + 1) = color.g;
+        *(frameBuffer.buffer + i * 3 + 2) = color.b;
+    }
 }
 
 
@@ -84,8 +76,11 @@ void DrawLine(FrameBuffer &frameBuffer, const glm::ivec2& p1, const glm::ivec2& 
 }
 
 
-void DrawPixel(FrameBuffer &frameBuffer, const glm::ivec2& p1, const HEX_COLOR& color){
-    frameBuffer.buffer[p1.y * frameBuffer.width + p1.x] = color;
+void DrawPixel(FrameBuffer &frameBuffer, const glm::ivec2& p1, const SNormColor3& color){
+    auto index = p1.y * frameBuffer.width * 3 + p1.x * 3;
+    frameBuffer.buffer[index] = color.r;
+    frameBuffer.buffer[index + 1] = color.g;
+    frameBuffer.buffer[index + 2] = color.b;
 }
 
 
@@ -119,6 +114,13 @@ void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p0, const glm::ivec
 }
 
 
+void processInput(GLFWwindow *window){
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+        glfwSetWindowShouldClose(window, true);
+    }
+}
+
+
 int main(){
     if(!glfwInit()){
         std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -138,15 +140,26 @@ int main(){
     glfwMakeContextCurrent(window);
 
     glViewport(0, 0, WIDTH, HEIGHT);
-    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_DEPTH_TEST);
+
+    FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
+    ClearFrameBuffer(frameBuffer, SNormColor3(255, 0, 0));
 
     while(!glfwWindowShouldClose(window)){
+        processInput(window);
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glRasterPos2i(0, 0);
+        glDrawPixels(WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, frameBuffer.buffer);
+        // RenderFrameBuffer(frameBuffer);
+        glfwSwapBuffers(window);
 
         glfwPollEvents();
     }
 
+    ReleaseFrameBuffer(&frameBuffer);
     glfwTerminate();
     return 0;
 }
