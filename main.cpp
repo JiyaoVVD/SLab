@@ -63,20 +63,20 @@ struct SwapFrameBuffer{
 };
 
 
+inline void DrawPixel(FrameBuffer &frameBuffer, const SVector2Int& p1, const SNormColor3& color){
+    auto index = (p1.y * frameBuffer.width + p1.x) * 3;
+    frameBuffer.buffer[index] = color.r;
+    frameBuffer.buffer[index + 1] = color.g;
+    frameBuffer.buffer[index + 2] = color.b;
+}
+
+
 void DrawLine(FrameBuffer &frameBuffer, const glm::ivec2& p1, const glm::ivec2& p2, const HEX_COLOR& color){
     float k = (float)(p2.y - p1.y) / (float)(p2.x - p1.x);
     for(int x = p1.x; x <= p2.x; ++x){
         int y = (int)glm::round(k * (x - p1.x) + p1.y);
         frameBuffer.buffer[y * frameBuffer.width + x] = color;
     }
-}
-
-
-inline void DrawPixel(FrameBuffer &frameBuffer, const SVector2Int& p1, const SNormColor3& color){
-    auto index = (p1.y * frameBuffer.width + p1.x) * 3;
-    frameBuffer.buffer[index] = color.r;
-    frameBuffer.buffer[index + 1] = color.g;
-    frameBuffer.buffer[index + 2] = color.b;
 }
 
 
