@@ -3,14 +3,13 @@
 #endif
 
 #include <windows.h>
-#include <graphics.h>
 #include <iostream>
-#include <glm.hpp>
+#include "glm.hpp"
 #include <conio.h>
 #include <oneapi/tbb/parallel_for.h>
 #include <chrono>
 #include <gl/GL.h>
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 #include <algorithm>
 
 #include "stype.h"
@@ -71,11 +70,11 @@ inline void DrawPixel(FrameBuffer &frameBuffer, const SVector2Int& p1, const SNo
 }
 
 
-void DrawLine(FrameBuffer &frameBuffer, const glm::ivec2& p1, const glm::ivec2& p2, const HEX_COLOR& color){
+void DrawLine(FrameBuffer &frameBuffer, const glm::ivec2& p1, const glm::ivec2& p2, const SNormColor3& color){
     float k = (float)(p2.y - p1.y) / (float)(p2.x - p1.x);
     for(int x = p1.x; x <= p2.x; ++x){
         int y = (int)glm::round(k * (x - p1.x) + p1.y);
-        frameBuffer.buffer[y * frameBuffer.width + x] = color;
+        DrawPixel(frameBuffer, SVector2Int(x, y), color);
     }
 }
 

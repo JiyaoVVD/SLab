@@ -12,7 +12,7 @@ public:
     Camera();
 
 private:
-    SType aspect;
+    SFloat aspect;
 };
 
 
