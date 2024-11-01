@@ -9,6 +9,7 @@
 #include <conio.h>
 #include <oneapi/tbb/parallel_for.h>
 #include <chrono>
+#include <gl/GL.h>
 #include <GLFW/glfw3.h>
 #include <algorithm>
 
@@ -43,12 +44,7 @@ void ReleaseFrameBuffer(FrameBuffer* frameBuffer){
 
 
 void RenderFrameBuffer(const FrameBuffer& frameBuffer){
-//    for(int i = 0; i < frameBuffer.height; i++){
-//        for(int j = 0; j < frameBuffer.width; j++){
-//            putpixel(j, i, frameBuffer.buffer[i * frameBuffer.width + j]);
-//        }
-//    }
-    glRasterPos2i(0, 0);
+    glRasterPos2i(-1, -1);
     glDrawPixels(frameBuffer.width, frameBuffer.height, GL_RGB, GL_UNSIGNED_BYTE, frameBuffer.buffer);
 }
 
@@ -76,21 +72,21 @@ void DrawLine(FrameBuffer &frameBuffer, const glm::ivec2& p1, const glm::ivec2& 
 }
 
 
-void DrawPixel(FrameBuffer &frameBuffer, const glm::ivec2& p1, const SNormColor3& color){
-    auto index = p1.y * frameBuffer.width * 3 + p1.x * 3;
+inline void DrawPixel(FrameBuffer &frameBuffer, const SVector2Int& p1, const SNormColor3& color){
+    auto index = (p1.y * frameBuffer.width + p1.x) * 3;
     frameBuffer.buffer[index] = color.r;
     frameBuffer.buffer[index + 1] = color.g;
     frameBuffer.buffer[index + 2] = color.b;
 }
 
 
-inline int64_t icross2(const glm::ivec2& v0, const glm::ivec2& v1)
+inline int64_t icross2(const SVector2Int& v0, const SVector2Int& v1)
 {
     return (int64_t)v0.x * v1.y - (int64_t)v0.y * v1.x;
 }
 
 
-void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p0, const glm::ivec2 p1, const glm::ivec2 p2, const HEX_COLOR& color){
+void DrawTriangle(FrameBuffer &frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SVector2Int& p2, const SNormColor3 color){
     auto lx = std::min(std::min(p0.x, p1.x), p2.x);
     auto rx = std::max(std::min(p0.x, p1.x), p2.x);
     auto by = std::max(std::max(p0.y, p1.y), p2.y);
@@ -99,7 +95,7 @@ void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p0, const glm::ivec
     {
         for(int y = ty; y <= by; ++y)
         {
-            glm::ivec2 point(x, y);
+            SVector2Int point(x, y);
 
             auto crs0 = icross2(p1 - p0, point - p0);
             auto crs1 = icross2(p2 - p1, point - p1);
@@ -107,7 +103,7 @@ void DrawTriangle(FrameBuffer &frameBuffer, const glm::ivec2 p0, const glm::ivec
             if(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 ||
                 crs0 <= 0 && crs1 <= 0 && crs2 <= 0)
             {
-                 frameBuffer.buffer[y * frameBuffer.width + x] = color;
+                 DrawPixel(frameBuffer, SVector2Int(x, y), color);
             }
         }
     }
@@ -127,9 +123,9 @@ int main(){
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // set opengl version to 2.1, enable immediate mode
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "SLab", NULL, NULL);
     if(!window){
@@ -140,22 +136,19 @@ int main(){
     glfwMakeContextCurrent(window);
 
     glViewport(0, 0, WIDTH, HEIGHT);
-//    glEnable(GL_DEPTH_TEST);
 
     FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
-    ClearFrameBuffer(frameBuffer, SNormColor3(255, 0, 0));
+    ClearFrameBuffer(frameBuffer, SNormColor3(0, 0, 0));
+
+    DrawTriangle(frameBuffer, SVector2Int(0, HEIGHT - 1), SVector2Int(WIDTH - 1, HEIGHT - 1), SVector2Int(WIDTH - 1, 0), SNormColor3(255, 0, 0));
 
     while(!glfwWindowShouldClose(window)){
         processInput(window);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        RenderFrameBuffer(frameBuffer);
 
-        glRasterPos2i(0, 0);
-        glDrawPixels(WIDTH, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, frameBuffer.buffer);
-        // RenderFrameBuffer(frameBuffer);
         glfwSwapBuffers(window);
-
         glfwPollEvents();
     }
 
@@ -163,24 +156,3 @@ int main(){
     glfwTerminate();
     return 0;
 }
-
-
-//int main(){
-//    // EasyX's init function
-//    FrameBuffer& frameBuffer = CreateFrameBuffer(WIDTH, HEIGHT);
-//    // ClearFrameBuffer(frameBuffer, RGB_TO_HEX_COLOR(255, 0, 0));
-//    DrawTriangle(frameBuffer, glm::ivec2(0, 0), glm::ivec2(0, HEIGHT-1), glm::ivec2(WIDTH-1, HEIGHT-1), RGB_TO_HEX_COLOR(255, 0, 0));
-//    initgraph(WIDTH, HEIGHT, EW_SHOWCONSOLE | EW_DBLCLKS);
-//
-//
-//    // receive keyboard event and exit
-//    while(!_kbhit()){
-//        RenderFrameBuffer(frameBuffer);
-//        Sleep(20);
-//    }
-//
-//    ReleaseFrameBuffer(&frameBuffer);
-//    // close EasyX
-//    closegraph();
-//    return 0;
-//}
