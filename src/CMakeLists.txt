@@ -13,10 +13,14 @@ include_directories(${GLFW_INCLUDE_DIR})
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-add_executable(slab main.cpp
-        Camera.cpp
-        Camera.h
-        FrameBuffer.h
+add_executable(slab
+        camera.cpp
+        renderer.cpp
+        main.cpp
+        camera.h
+        renderer.h
+        framebuffer.cpp
+        framebuffer.cpp
 )
 
 target_link_libraries(slab OpenGL::GL)

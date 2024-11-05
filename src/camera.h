@@ -13,6 +13,11 @@ public:
 
 private:
     SFloat aspect;
+    SFloat fov;
+
+    SMatrix4 projMatrix;
+    SMatrix4 viewMatrix;
+    SMatrix4 viewportMatrix;
 };
 
 
