@@ -8,7 +8,8 @@ typedef double SFloat;
 typedef glm::dvec2 SVector2;
 typedef glm::dvec3 SVector3;
 typedef glm::dvec4 SVector4;
-typedef glm::dvec4 SMatrix4;
+typedef glm::dmat4 SMatrix4;
+typedef glm::dmat3 SMatrix3;
 typedef glm::fvec4 SColor4;
 typedef glm::fvec3 SColor3;
 #define S_CONST_FLOAT(num) num
@@ -18,6 +19,7 @@ typedef glm::fvec2 SVector2;
 typedef glm::fvec3 SVector3;
 typedef glm::fvec4 SVector4;
 typedef glm::fmat4 SMatrix4;
+typedef glm::fmat3 SMatrix3;
 typedef glm::fvec3 SColor3;
 typedef glm::fvec4 SColor4;
 #define S_CONST_FLOAT(num) num##f
@@ -32,6 +34,24 @@ typedef glm::uvec3 SNormColor3;
 
 typedef unsigned char SByte;
 
+namespace SConst {
+    const SVector3 up(0, 1, 0);
+    const SVector3 right(1, 0, 0);
+    const SVector3 forward(0, 0, 1);
+
+
+    const SMatrix4 identity4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+    );
+    const SMatrix3 identity3(
+            1, 0, 0,
+            0, 1, 0,
+            0, 0, 1
+    );
+}
 
 #define MIN(X, Y)\
     ((X) < (Y) ? (X) : (Y))
