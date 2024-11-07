@@ -17,7 +17,7 @@ Camera::Camera(SVector3 pos, SVector3 lookPos, SVector3 worldUp){
     for(int i = 0; i < 3; i++){
         rot[0][i] = right[i];
         rot[1][i] = up[i];
-        rot[2][i] = -front[i];
+        rot[2][i] = front[i];
     }
 
     viewMatrix = rot * trans;
@@ -55,6 +55,19 @@ Camera::projection(){
     return projMatrix;
 }
 
+
+void
+Camera::setPerspective(SFloat fov, SFloat aspect, SFloat near, SFloat far) {
+    projMatrix = persProjection(fov, aspect, near, far);
+}
+
+
+void
+Camera::setOrthodox(SFloat left, SFloat right, SFloat top, SFloat bottom, SFloat near, SFloat far) {
+    projMatrix = orthoProjection(left, right, top, bottom, near, far);
+}
+
+
 SMatrix4
 Camera::orthoProjection(SFloat left, SFloat right, SFloat top, SFloat bottom, SFloat near, SFloat far){
     near = -near;
@@ -75,21 +88,20 @@ Camera::orthoProjection(SFloat left, SFloat right, SFloat top, SFloat bottom, SF
 
 SMatrix4
 Camera::persProjection(SFloat fov, SFloat aspect, SFloat near, SFloat far){
-    SFloat near_view = -near;
-    SFloat far_view = -far;
-    SFloat theta = glm::radians(fov / S_CONST_FLOAT(2.0));
-    SFloat top = near * glm::tan(theta);
-    SFloat bottom = -top;
-    SFloat right = top * aspect;
-    SFloat left = -right;
+    SFloat rad = glm::radians(fov);
+    SFloat tanHalfFov = glm::tan(rad / S_CONST_FLOAT(2.0));
 
-    SMatrix4 orth = orthoProjection(left, right, top, bottom, near, far);
-    SMatrix4 per2orth{0};
-    per2orth[0][0] = near_view;
-    per2orth[1][1] = near_view;
-    per2orth[2][2] = near_view + far_view;
-    per2orth[2][3] = -near_view * far_view;
-    per2orth[3][2] = 1.0f;
+    SFloat f = S_CONST_FLOAT(1.0) / tanHalfFov;
+    SFloat range = far - near;
+    SFloat A = -(far + near) / range;
+    SFloat B = S_CONST_FLOAT(-2.0) * far * near / range;
 
-    return orth * per2orth;
+    SMatrix4 projectionMatrix{
+        f / aspect, 0, 0, 0,
+        0, f, 0, 0,
+        0, 0, A, B,
+        0, 0, 1, 1
+    };
+    PrintMatrix(projectionMatrix);
+    return projectionMatrix;
 }

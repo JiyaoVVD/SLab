@@ -33,6 +33,14 @@ typedef glm::uvec4 SNormColor4;
 typedef glm::uvec3 SNormColor3;
 
 typedef unsigned char SByte;
+typedef uint64_t SIndex;
+
+struct SVertex{
+    SVector3 position;
+    SVector3 normal;
+    SColor3 color;
+};
+
 
 namespace SConst {
     const SVector3 up(0, 1, 0);

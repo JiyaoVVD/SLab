@@ -6,6 +6,7 @@
 #define SLAB_CAMERA_H
 
 #include "stype.h"
+#include "math_utils.h"
 
 class Camera {
 public:
@@ -15,7 +16,8 @@ public:
     SVector3 position();
     SVector3 direction();
     SVector3 up();
-
+    void setOrthodox(SFloat left, SFloat right, SFloat top, SFloat bottom, SFloat near, SFloat far);
+    void setPerspective(SFloat fov, SFloat aspect, SFloat near, SFloat far);
 public:
     enum CameraMode{
         ORTHODOX,
