@@ -10,27 +10,29 @@
 
 class Camera {
 public:
-    Camera(SVector3 pos, SVector3 lookPos, SVector3 up);
-    const SMatrix4& projection();
-    const SMatrix4& view();
-    SVector3 position();
-    SVector3 direction();
-    SVector3 up();
-    void setOrthodox(SFloat left, SFloat right, SFloat top, SFloat bottom, SFloat near, SFloat far);
-    void setPerspective(SFloat fov, SFloat aspect, SFloat near, SFloat far);
-public:
     enum CameraMode{
         ORTHODOX,
         PERSPECTIVE,
     };
-
+public:
+    Camera(SVector3 pos, SVector3 lookPos, SVector3 up);
+    const SMatrix4 & projection() const;
+    const SMatrix4 & view() const;
+    inline SVector3 position() const;
+    inline SVector3 direction() const;
+    inline SVector3 up() const;
+    void setPosition(const SVector3& pos);
+    void setPosition(SFloat x, SFloat y, SFloat z);
+    void setDirection(const SVector3& dir, const SVector3& up);
+    void setDirection(SFloat x, SFloat y, SFloat z, SFloat upX, SFloat upY, SFloat upZ);
+    void setLookat(const SVector3& lookat, const SVector3& worldUp);
+    void setLookat(SFloat x, SFloat y, SFloat z, SFloat upX, SFloat upY, SFloat upZ);
+    void setOrthodox(SFloat left, SFloat right, SFloat top, SFloat bottom, SFloat near, SFloat far);
+    void setPerspective(SFloat fov, SFloat aspect, SFloat near, SFloat far);
 private:
-
+    SMatrix4 calcRotationMat(const SVector3& dir, const SVector3& up);
+private:
     CameraMode mode;
-
-    // perspective
-    SFloat aspect;
-    SFloat fov;
 
     SMatrix4 projMatrix;
     SMatrix4 viewMatrix;

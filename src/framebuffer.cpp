@@ -23,7 +23,7 @@ void ReleaseFrameBuffer(FrameBuffer* frameBuffer){
 
 void RenderFrameBuffer(const FrameBuffer* frameBuffer){
     glRasterPos2i(-1, -1);      // set glDrawPixels' begin pos to left-bottom
-    glDrawPixels(frameBuffer->width, frameBuffer->height, GL_RGB, GL_UNSIGNED_BYTE, frameBuffer->buffer);
+    glDrawPixels((GLsizei)frameBuffer->width, (GLsizei)frameBuffer->height, GL_RGB, GL_UNSIGNED_BYTE, frameBuffer->buffer);
 }
 
 
@@ -44,12 +44,32 @@ inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p1, const SNo
 }
 
 
-void DrawLine(FrameBuffer *frameBuffer, const glm::ivec2& p1, const glm::ivec2& p2, const SNormColor3& color){
-    float k = (float)(p2.y - p1.y) / (float)(p2.x - p1.x);
-    for(int x = p1.x; x <= p2.x; ++x){
-        int y = (int)glm::round(k * (x - p1.x) + p1.y);
-        DrawPixel(frameBuffer, SVector2Int(x, y), color);
+void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SNormColor3& color){
+    int x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y;
+    int dx = glm::abs(x1 - x0);
+    int dy = glm::abs(y1 - y0);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+
+    while(true){
+        DrawPixel(frameBuffer, SVector2Int(x0, y0), color);
+        if(x0 == x1 && y0 == y1) break;
+        int e2 = 2 * err;
+        if(e2 > -dy){
+            err -= dy;
+            x0 += sx;
+        }
+        if(e2 < dx){
+            err += dx;
+            y0 += sy;
+        }
     }
+//    SFloat k = (SFloat)(p2.y - p1.y) / (SFloat)(p2.x - p1.x);
+//    for(int x = p1.x; x <= p2.x; ++x){
+//        int y = (int)glm::round(k * (SFloat)(x - p1.x) + (SFloat)p1.y);
+//        DrawPixel(frameBuffer, SVector2Int(x, y), color);
+//    }
 }
 
 
