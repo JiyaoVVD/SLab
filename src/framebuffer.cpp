@@ -36,8 +36,12 @@ void ClearFrameBuffer(FrameBuffer* frameBuffer, const SNormColor3& color){
 }
 
 
-inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p1, const SNormColor3& color){
-    auto index = (p1.y * frameBuffer->width + p1.x) * 3;
+inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNormColor3& color){
+    if(
+        p.x < 0 || p.x >= frameBuffer->width || p.y < 0 || p.y >= frameBuffer->height
+    )
+        return;
+    auto index = (p.y * frameBuffer->width + p.x) * 3;
     frameBuffer->buffer[index] = color.r;
     frameBuffer->buffer[index + 1] = color.g;
     frameBuffer->buffer[index + 2] = color.b;
