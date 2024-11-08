@@ -22,6 +22,17 @@ void processInput(GLFWwindow *window){
 }
 
 
+SVector3 calcCamPos(SVector3 center, SFloat deg, SFloat dist){
+    SFloat rad = glm::radians(deg);
+    SVector3 offset{
+        glm::cos(rad) * dist,
+        S_CONST_FLOAT(0.0),
+        glm::sin(rad) * dist,
+    };
+    return center + offset;
+}
+
+
 int main(){
     if(!glfwInit()){
         std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -44,12 +55,22 @@ int main(){
 
     glViewport(0, 0, WIDTH, HEIGHT);
 
+    auto deg = S_CONST_FLOAT(0.0);
+    SVector3 center(0);
+    SVector3 newPos;
+    SFloat dist = S_CONST_FLOAT(2.0);
+
     Renderer renderer(WIDTH, HEIGHT, window, Renderer::SLAB_LINE_MODE);
     auto camera = new Camera(SVector3(0, 0, S_CONST_FLOAT(-2.0)), SVector3(0, 0, 0), SVector3(0, 1, 0));
     camera->setPerspective(S_CONST_FLOAT(90.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(0.01), S_CONST_FLOAT(100.0));
     renderer.setCamera(camera);
     while(!glfwWindowShouldClose(window)){
         processInput(window);
+
+        deg += S_CONST_FLOAT(1.0);
+        newPos = calcCamPos(center, deg, dist);
+        camera->setPosition(newPos);
+        camera->setLookat(center, SConst::up);
 
         renderer.render();
 

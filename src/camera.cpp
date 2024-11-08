@@ -59,7 +59,6 @@ Camera::setPosition(const SVector3& pos) {
     viewMatrix[0][3] = pos.x;
     viewMatrix[1][3] = pos.y;
     viewMatrix[2][3] = pos.z;
-
 }
 
 
