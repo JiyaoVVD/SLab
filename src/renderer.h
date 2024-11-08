@@ -15,9 +15,9 @@
 class Renderer {
 public:
     enum RenderMode{
-        TRIANGLE,
-        LINE,
-        LINE_LOOP,
+        SLAB_TRIANGLE_MODE,
+        SLAB_LINE_MODE,
+        SLAB_LINE_LOOP_MODE,
     };
 public:
     Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMode renderMode);
@@ -31,12 +31,17 @@ public:
     void setVertices(std::vector<SVertex> vertices);
     void setVertices(SVertex* vertices, size_t numVertices);
     void setRenderMode(RenderMode renderMode);
+    void setCamera(const Camera* camera);
+private:
+    void drawLineMode();
+    void drawLineLoopMode();
+    void drawTriangleMode();
 private:
     FrameBuffer* frameBuffer;
     GLFWwindow* window;
     SNormColor3 background;
 
-    Camera* camera;
+    const Camera* camera;
 
     RenderMode renderMode;
 

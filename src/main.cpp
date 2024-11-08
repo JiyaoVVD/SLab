@@ -44,8 +44,10 @@ int main(){
 
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    Renderer renderer(WIDTH, HEIGHT, window);
-
+    Renderer renderer(WIDTH, HEIGHT, window, Renderer::SLAB_LINE_MODE);
+    auto camera = new Camera(SVector3(0, 0, S_CONST_FLOAT(-2.0)), SVector3(0, 0, 0), SVector3(0, 1, 0));
+    camera->setPerspective(S_CONST_FLOAT(90.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(0.01), S_CONST_FLOAT(100.0));
+    renderer.setCamera(camera);
     while(!glfwWindowShouldClose(window)){
         processInput(window);
 
@@ -55,5 +57,7 @@ int main(){
     }
 
     glfwTerminate();
+    renderer.setCamera(nullptr);
+    delete camera;
     return 0;
 }
