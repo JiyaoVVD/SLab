@@ -2,6 +2,7 @@
 #define SLAB_STYPE_H
 
 #include <glm.hpp>
+#include <ext.hpp>
 
 #ifdef SLAB_PRECISION_DOUBLE
 typedef double SFloat;
@@ -54,6 +55,7 @@ namespace SConst {
             0, 0, 1, 0,
             0, 0, 0, 1
     );
+
     const SMatrix3 identity3(
             1, 0, 0,
             0, 1, 0,

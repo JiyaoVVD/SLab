@@ -18,9 +18,9 @@ public:
     Camera(SVector3 pos, SVector3 lookPos, SVector3 up);
     const SMatrix4 & projection() const;
     const SMatrix4 & view() const;
-    inline SVector3 position() const;
-    inline SVector3 direction() const;
-    inline SVector3 up() const;
+    SVector3 position() const;
+    SVector3 direction() const;
+    SVector3 up() const;
     void setPosition(const SVector3& pos);
     void setPosition(SFloat x, SFloat y, SFloat z);
     void setDirection(const SVector3& dir, const SVector3& up);
@@ -30,9 +30,13 @@ public:
     void setOrthodox(SFloat left, SFloat right, SFloat top, SFloat bottom, SFloat near, SFloat far);
     void setPerspective(SFloat fov, SFloat aspect, SFloat near, SFloat far);
 private:
-    SMatrix4 calcRotationMat(const SVector3& dir, const SVector3& up);
+    void calcViewMatrix(const SVector3& position, const SVector3& dir, const SVector3& up);
 private:
     CameraMode mode;
+
+    SVector3 pos;
+    SVector3 dir;
+    SVector3 worldUp;
 
     SMatrix4 projMatrix;
     SMatrix4 viewMatrix;
