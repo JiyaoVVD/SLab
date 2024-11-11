@@ -6,6 +6,7 @@
 #define MATH_UTILS_H
 
 #include <iostream>
+#include <iomanip>
 #include <glm.hpp>
 #include "stype.h"
 
@@ -20,7 +21,7 @@ template<int D1, int D2>
 inline void PrintMatrix(const glm::mat<D1, D2, SFloat>& mat){
     for(int i = 0; i < D1; ++i){
         for(int j = 0; j < D2; ++j){
-            std::cout << mat[i][j] << "\t";
+            std::cout << std::setprecision(2) << mat[i][j] << "\t";
         }
         std::cout << std::endl;
     }

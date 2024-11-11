@@ -15,22 +15,22 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
     renderMode(renderMode){
     auto testVertices = new SVertex[]{
             {
-                    {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.0)},
+                    {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
                     {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
             },
             {
-                    {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.0)},
+                    {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
                     {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
             },
             {
-                    {S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.0)},
+                    {S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
                     {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
             },
             {
-                    {S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.0)},
+                    {S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
                     {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
             },
@@ -64,12 +64,12 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
         5, 6,
         6, 7,
         7, 4,
-        0, 4,
-        1, 5,
-        2, 6,
-        3, 7
+//        0, 4,
+//        1, 5,
+//        2, 6,
+//        3, 7
     };
-    setVertices(testVertices, 8, indices, 24);
+    setVertices(testVertices, 8, indices, 16);
 }
 
 
@@ -162,9 +162,9 @@ Renderer::drawLineMode(){
     for(auto vertex: vertexBuffer){
         SVector4 p(vertex.position, S_CONST_FLOAT(1.0));
         p = camera->view() * p;
+        SFloat w = p.z;
         p = camera->projection() * p;
-        SFloat w = p.w;
-        SVector3 pNdc(p.x / w, p.y / w, p.z / 2);
+        SVector3 pNdc(p.x / w, p.y / w, p.z);
         SVector3Int pScreen(
                 (pNdc.x * (SFloat)frameBuffer->width) / 2 + (SFloat)frameBuffer->width / 2,
                 (pNdc.y * (SFloat)frameBuffer->height) / 2 + (SFloat)frameBuffer->height / 2,

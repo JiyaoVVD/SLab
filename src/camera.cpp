@@ -5,90 +5,75 @@
 #include "camera.h"
 
 
-SMatrix4
-Camera::calcRotationMat(const SVector3& direction, const SVector3& worldUp) {
+void
+Camera::calcViewMatrix(const SVector3& position, const SVector3& direction, const SVector3& worldUp) {
+    SMatrix4 trans = SConst::identity4;
+    trans[3] = SVector4(-position, 1);
     auto normDir = glm::normalize(direction);
-    SVector3 right = glm::normalize(glm::cross(normDir, worldUp));
-    SVector3 up = glm::normalize(glm::cross(right, normDir));
+    SVector3 right = glm::normalize(glm::cross(worldUp, direction));
+    SVector3 up = glm::normalize(glm::cross(normDir, right));
     SMatrix4 rot = SConst::identity4;
     for(int i = 0; i < 3; i++){
-        rot[0][i] = right[i];
-        rot[1][i] = up[i];
-        rot[2][i] = normDir[i];
+        rot[i][0] = right[i];
+        rot[i][1] = up[i];
+        rot[i][2] = normDir[i];
     }
-    return rot;
-}
-
-
-Camera::Camera(SVector3 pos, SVector3 lookPos, SVector3 worldUp){
-    SMatrix4 trans = SConst::identity4;
-    for(int i = 0; i < 3; i++){
-        trans[i][3] = -pos[i];
-    }
-    SVector3 front = glm::normalize((lookPos - pos));
-    auto rot = calcRotationMat(front, worldUp);
-
     viewMatrix = rot * trans;
 }
 
 
-inline SVector3
+Camera::Camera(SVector3 pos, SVector3 lookPos, SVector3 worldUp):
+    pos(pos), dir(glm::normalize(lookPos - pos)), worldUp(worldUp)
+{
+    calcViewMatrix(pos, dir, worldUp);
+}
+
+
+
+SVector3
 Camera::position() const{
-    return SVector3{
-            -viewMatrix[0][3],
-            -viewMatrix[1][3],
-            -viewMatrix[2][3]
-    };
+    return pos;
 }
 
-
-inline SVector3
-Camera::up() const{
-    return viewMatrix[1];
-}
-
-
-inline SVector3
+SVector3
 Camera::direction() const{
-    return -viewMatrix[2];
+    return dir;
+}
+
+
+SVector3
+Camera::up() const{
+    return worldUp;
 }
 
 
 void
 Camera::setPosition(const SVector3& pos) {
-    viewMatrix[0][3] = pos.x;
-    viewMatrix[1][3] = pos.y;
-    viewMatrix[2][3] = pos.z;
+    this->pos = pos;
+    calcViewMatrix(pos, dir, worldUp);
 }
 
 
 void
 Camera::setPosition(SFloat x, SFloat y, SFloat z) {
-    viewMatrix[0][3] = x;
-    viewMatrix[1][3] = y;
-    viewMatrix[2][3] = z;
+    this->pos = {x, y, z};
+    calcViewMatrix(pos, dir, worldUp);
 }
 
 
 void
 Camera::setDirection(const SVector3& dir, const SVector3& worldUp) {
-    auto rot = calcRotationMat(dir, worldUp);
-    for(int i = 0; i < 3; i++){
-        viewMatrix[0][i] = rot[0][i];
-        viewMatrix[1][i] = rot[1][i];
-        viewMatrix[2][i] = rot[2][i];
-    }
+    this->dir = glm::normalize(dir);
+    this->worldUp = glm::normalize(worldUp);
+    calcViewMatrix(pos, dir, worldUp);
 }
 
 
 void
 Camera::setDirection(SFloat x, SFloat y, SFloat z,SFloat upX, SFloat upY, SFloat upZ) {
-    auto rot = calcRotationMat(SVector3(x, y, z), SVector3(upX, upY, upZ));
-    for(int i = 0; i < 3; i++){
-        viewMatrix[0][i] = rot[0][i];
-        viewMatrix[1][i] = rot[1][i];
-        viewMatrix[2][i] = rot[2][i];
-    }
+    this->dir = glm::normalize(SVector3(x, y, z));
+    this->worldUp = glm::normalize(SVector3(upX, upY, upZ));
+    calcViewMatrix(pos, dir, worldUp);
 }
 
 
@@ -158,9 +143,8 @@ Camera::persProjection(SFloat fov, SFloat aspect, SFloat near, SFloat far){
     SMatrix4 projectionMatrix{
         f / aspect, 0, 0, 0,
         0, f, 0, 0,
-        0, 0, A, B,
-        0, 0, 1, 1
+        0, 0, -A, 1,
+        0, 0, B, 0
     };
-    PrintMatrix(projectionMatrix);
     return projectionMatrix;
 }
