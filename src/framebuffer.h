@@ -22,6 +22,13 @@ void ReleaseFrameBuffer(FrameBuffer* frameBuffer);
 void RenderFrameBuffer(const FrameBuffer* frameBuffer);
 void ClearFrameBuffer(FrameBuffer* frameBuffer, const SNormColor3& color);
 inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p1, const SNormColor3& color);
-void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p1, const SVector2Int& p2, const SNormColor3& color);
-void DrawTriangle(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SVector2Int& p2, const SNormColor3& color);
+void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SNormColor3& c0, const SNormColor3& c1);
+void DrawTriangle(
+        FrameBuffer *frameBuffer,
+        const SVector2Int& p0,
+        const SVector2Int& p1,
+        const SVector2Int& p2,
+        const SNormColor3& c0,
+        const SNormColor3& c1,
+        const SNormColor3& c2);
 #endif //FRAMEBUFFER_H

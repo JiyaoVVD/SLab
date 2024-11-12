@@ -3,6 +3,8 @@
 
 #include <glm.hpp>
 #include <ext.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 
 #ifdef SLAB_PRECISION_DOUBLE
 typedef double SFloat;
@@ -39,7 +41,15 @@ typedef uint64_t SIndex;
 struct SVertex{
     SVector3 position;
     SVector3 normal;
-    SColor3 color;
+    SColor4 color;
+};
+
+
+struct SFragment{
+    SVector2 coord;
+    SVector3 normal;
+    SColor4 color;
+    SFloat depth;
 };
 
 

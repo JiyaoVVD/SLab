@@ -70,7 +70,7 @@ int main(){
     SVector3 newPos;
     SFloat dist = S_CONST_FLOAT(2.0);
 
-    Renderer renderer(WIDTH, HEIGHT, window, Renderer::SLAB_LINE_MODE);
+    Renderer renderer(WIDTH, HEIGHT, window, Renderer::SLAB_TRIANGLE_MODE);
     auto camera = new Camera(SVector3(S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(-4.0)), SVector3(0, 0, 0), SVector3(0, 1, 0));
     camera->setPerspective(S_CONST_FLOAT(90.0), (SFloat)WIDTH / HEIGHT, S_CONST_FLOAT(0.01), S_CONST_FLOAT(1000.0));
     // camera->setOrthodox(S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.001), S_CONST_FLOAT(100.0));
