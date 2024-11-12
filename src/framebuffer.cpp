@@ -48,15 +48,18 @@ inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNor
 }
 
 
-void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SNormColor3& color){
+void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SNormColor3& c0, const SNormColor3& c1){
     int x0 = p0.x, y0 = p0.y, x1 = p1.x, y1 = p1.y;
     int dx = glm::abs(x1 - x0);
     int dy = glm::abs(y1 - y0);
     int sx = (x0 < x1) ? 1 : -1;
     int sy = (y0 < y1) ? 1 : -1;
     int err = dx - dy;
+    SFloat len = glm::length((SVector2)(p1 - p0));
+
 
     while(true){
+        auto color = glm::mix((SVector3)c0, (SVector3)c1, glm::length(SVector2(x0, y0) - (SVector2)p0) / len);
         DrawPixel(frameBuffer, SVector2Int(x0, y0), color);
         if(x0 == x1 && y0 == y1) break;
         int e2 = 2 * err;
@@ -77,7 +80,14 @@ void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int
 }
 
 
-void DrawTriangle(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SVector2Int& p2, const SNormColor3 color){
+void DrawTriangle(
+        FrameBuffer *frameBuffer,
+        const SVector2Int& p0,
+        const SVector2Int& p1,
+        const SVector2Int& p2,
+        const SNormColor3& c0,
+        const SNormColor3& c1,
+        const SNormColor3& c2){
     auto lx = std::min(std::min(p0.x, p1.x), p2.x);
     auto rx = std::max(std::min(p0.x, p1.x), p2.x);
     auto by = std::max(std::max(p0.y, p1.y), p2.y);
@@ -94,7 +104,12 @@ void DrawTriangle(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector
             if(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 ||
                crs0 <= 0 && crs1 <= 0 && crs2 <= 0)
             {
-                DrawPixel(frameBuffer, SVector2Int(x, y), color);
+                // TODO: to be optimized
+                auto w0 = (SFloat)((p1.y - p2.y) * (x - p2.x) + (p2.x - p1.x) * (y - p2.y)) / ((p1.y - p2.y) * (p0.x - p2.x) + (p2.x - p1.x) * (p0.y - p2.y));
+                auto w1 = (SFloat)((p2.y - p0.y) * (x - p2.x) + (p0.x - p2.x) * (y - p2.x)) / ((p1.y - p2.y) * (p0.x - p2.x) + (p2.x - p1.x) * (p0.y - p2.y));
+                auto w2 = S_CONST_FLOAT(1.0) - w0 - w1;
+                auto color = (SVector3)c0 * w0 + (SVector3) c1 * w1 + (SVector3) c2 * w2;
+                DrawPixel(frameBuffer, SVector2Int(x, y), (SNormColor3)color);
             }
         }
     }

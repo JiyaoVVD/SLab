@@ -5,6 +5,22 @@
 #include "renderer.h"
 
 #include <utility>
+#include <random>
+
+
+SColor4 RandomColor(){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
+    SColor4 color{
+        dis(gen),
+        dis(gen),
+        dis(gen),
+        S_CONST_FLOAT(1.0)
+    };
+
+    return color;
+}
 
 
 Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMode renderMode):
@@ -17,59 +33,59 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
             {
                     {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
             {
                     {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
             {
                     {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
             {
                     {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0)},
+                    RandomColor()
             },
     };
     auto indices = new SIndex[]{
-        0, 1,
-        1, 2,
-        2, 3,
-        3, 0,
-        4, 5,
-        5, 6,
-        6, 7,
-        7, 4,
-        0, 4,
-        1, 5,
-        2, 6,
-        3, 7
+        0, 1, 2,
+//        0, 2, 3,
+//        4, 5, 6,
+//        4, 6, 7,
+//        4, 5,
+//        5, 6,
+//        6, 7,
+//        7, 4,
+//        0, 4,
+//        1, 5,
+//        2, 6,
+//        3, 7
     };
-    setVertices(testVertices, 8, indices, 24);
+    setVertices(testVertices, 8, indices, 3);
 }
 
 
@@ -151,7 +167,9 @@ Renderer::drawLineLoopMode(){
         SIndex end = indexBuffer[(i + 1) % sizeIndices];
         SVector3Int startPoint = points[start];
         SVector3Int endPoint = points[end];
-        DrawLine(frameBuffer, startPoint, endPoint, SNormColor3(255, 255, 255));
+        auto colorStart = NORMALIZE_COLOR_4(vertexBuffer[start].color);
+        auto colorEnd = NORMALIZE_COLOR_4(vertexBuffer[end].color);
+        DrawLine(frameBuffer, startPoint, endPoint, colorStart, colorEnd);
     }
 }
 
@@ -179,14 +197,43 @@ Renderer::drawLineMode(){
         SIndex end = indexBuffer[(i + 1) % sizeIndices];
         SVector3Int startPoint = points[start];
         SVector3Int endPoint = points[end];
-        DrawLine(frameBuffer, startPoint, endPoint, SNormColor3(255, 255, 255));
+        auto colorStart = NORMALIZE_COLOR_4(vertexBuffer[start].color);
+        auto colorEnd = NORMALIZE_COLOR_4(vertexBuffer[end].color);
+        DrawLine(frameBuffer, startPoint, endPoint, colorStart, colorEnd);
     }
 }
 
 
 void
 Renderer::drawTriangleMode() {
-
+    std::vector<SVector3> points;
+    for(auto vertex: vertexBuffer){
+        SVector4 p(vertex.position, S_CONST_FLOAT(1.0));
+        p = camera->view() * p;
+        p = camera->projection() * p;
+        SFloat w = p.w;
+        SVector3 pNdc(p.x / w, p.y / w, p.z);
+        SVector3Int pScreen(
+                (pNdc.x * (SFloat)frameBuffer->width) / 2 + (SFloat)frameBuffer->width / 2,
+                (pNdc.y * (SFloat)frameBuffer->height) / 2 + (SFloat)frameBuffer->height / 2,
+                pNdc.z
+        );
+        points.emplace_back(pScreen);
+    }
+    auto sizeIndices = indexBuffer.size();
+    assert(!(sizeIndices % 3));
+    for(int i = 0; i < indexBuffer.size(); i += 3){
+        SIndex i0 = indexBuffer[i];
+        SIndex i1 = indexBuffer[i + 1];
+        SIndex i2 = indexBuffer[i + 2];
+        SVector3Int v0 = points[i0];
+        SVector3Int v1 = points[i1];
+        SVector3Int v2 = points[i2];
+        auto c0 = NORMALIZE_COLOR_4(vertexBuffer[i0].color);
+        auto c1 = NORMALIZE_COLOR_4(vertexBuffer[i1].color);
+        auto c2 = NORMALIZE_COLOR_4(vertexBuffer[i2].color);
+        DrawTriangle(frameBuffer, v0, v1, v2, c0, c1, c2);
+    }
 }
 
 
