@@ -22,12 +22,13 @@ void processInput(GLFWwindow *window){
 }
 
 
-SVector3 calcCamPos(SVector3 center, SFloat deg, SFloat dist){
+SVector3 calcCamPos(SVector3 center, SFloat deg, SFloat degY, SFloat dist){
     SFloat rad = glm::radians(deg);
+    SFloat radY = glm::radians(degY);
     SVector3 offset{
-        glm::cos(rad) * dist,
-        S_CONST_FLOAT(0.0),
-        glm::sin(rad) * dist,
+        glm::cos(rad) * glm::sin(radY) * dist,
+        glm::cos(radY) * dist,
+        glm::sin(rad) * glm::sin(radY) * dist,
     };
     return center + offset;
 }
@@ -65,11 +66,11 @@ int main(){
 
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    auto deg = S_CONST_FLOAT(0.0);
+    auto deg = S_CONST_FLOAT(0.0), degY = S_CONST_FLOAT(45.0);
     SVector3 center(0);
     SVector3 newPos;
     SFloat dist = S_CONST_FLOAT(2.0);
-
+    SFloat deltaY = S_CONST_FLOAT(0.5);
     Renderer renderer(WIDTH, HEIGHT, window, Renderer::SLAB_TRIANGLE_MODE);
     auto camera = new Camera(SVector3(S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(-4.0)), SVector3(0, 0, 0), SVector3(0, 1, 0));
     camera->setPerspective(S_CONST_FLOAT(90.0), (SFloat)WIDTH / HEIGHT, S_CONST_FLOAT(0.01), S_CONST_FLOAT(1000.0));
@@ -78,8 +79,11 @@ int main(){
     while(!glfwWindowShouldClose(window)){
         processInput(window);
 
-        deg += S_CONST_FLOAT(0.2);
-        newPos = calcCamPos(center, deg, dist);
+        deg += S_CONST_FLOAT(1.0);
+        degY += deltaY;
+        if(degY >= S_CONST_FLOAT(135.0)) deltaY = S_CONST_FLOAT(-0.5);
+        if(degY <= S_CONST_FLOAT(45.0)) deltaY = S_CONST_FLOAT(0.5);
+        newPos = calcCamPos(center, deg, degY, dist);
         camera->setPosition(newPos);
         camera->setLookat(center, SConst::up);
 

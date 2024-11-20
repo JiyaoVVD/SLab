@@ -18,7 +18,7 @@ SColor4 RandomColor(){
         dis(gen),
         S_CONST_FLOAT(1.0)
     };
-
+    PrintVector<4>(color);
     return color;
 }
 
@@ -38,54 +38,60 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
             {
                     {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
             },
             {
                     {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
             },
             {
                     {S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)}
             },
             {
                     {S_CONST_FLOAT(0.5), S_CONST_FLOAT(-0.5), S_CONST_FLOAT(0.5)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)}
             },
     };
     auto indices = new SIndex[]{
-        0, 1, 2,
-//        0, 2, 3,
-//        4, 5, 6,
-//        4, 6, 7,
-//        4, 5,
-//        5, 6,
-//        6, 7,
-//        7, 4,
-//        0, 4,
-//        1, 5,
-//        2, 6,
-//        3, 7
+        // front
+        2, 1, 0,
+        3, 2, 0,
+        // back
+        4, 5, 6,
+        4, 6, 7,
+        // top
+        1, 6, 5,
+        1, 2, 6,
+        // bottom
+        0, 4, 3,
+        4, 7, 3,
+        // left
+        4, 0, 5,
+        0, 1, 5,
+        //right
+        3, 6, 2,
+        3, 7, 6,
     };
-    setVertices(testVertices, 8, indices, 3);
+    setVertices(testVertices, 8, indices, 36);
 }
 
 
