@@ -89,7 +89,7 @@ void DrawTriangle(
         const SNormColor3& c1,
         const SNormColor3& c2){
     auto lx = std::min(std::min(p0.x, p1.x), p2.x);
-    auto rx = std::max(std::min(p0.x, p1.x), p2.x);
+    auto rx = std::max(std::max(p0.x, p1.x), p2.x);
     auto by = std::max(std::max(p0.y, p1.y), p2.y);
     auto ty = std::min(std::min(p0.y, p1.y), p2.y);
     for(int x = lx; x <= rx; ++x)
@@ -101,14 +101,14 @@ void DrawTriangle(
             auto crs0 = icross2(p1 - p0, point - p0);
             auto crs1 = icross2(p2 - p1, point - p1);
             auto crs2 = icross2(p0 - p2, point - p2);
-            if(crs0 >= 0 && crs1 >= 0 && crs2 >= 0 ||
-               crs0 <= 0 && crs1 <= 0 && crs2 <= 0)
+            if((crs0 >= 0 && crs1 >= 0 && crs2 >= 0)) // ||
+               //(crs0 <= 0 && crs1 <= 0 && crs2 <= 0))
             {
                 // TODO: to be optimized
-                auto w0 = (SFloat)((p1.y - p2.y) * (x - p2.x) + (p2.x - p1.x) * (y - p2.y)) / ((p1.y - p2.y) * (p0.x - p2.x) + (p2.x - p1.x) * (p0.y - p2.y));
-                auto w1 = (SFloat)((p2.y - p0.y) * (x - p2.x) + (p0.x - p2.x) * (y - p2.x)) / ((p1.y - p2.y) * (p0.x - p2.x) + (p2.x - p1.x) * (p0.y - p2.y));
+                auto w0 = (SFloat)(-(x - p1.x) * (p2.y - p1.y) + (y - p1.y) * (p2.x - p1.x)) / (-(p0.x - p1.x) * (p2.y - p1.y) + (p0.y - p1.y) * (p2.x - p1.x));
+                auto w1 = (SFloat)(-(x - p2.x) * (p0.y - p2.y) + (y - p2.y) * (p0.x - p2.x)) / (-(p1.x - p2.x) * (p0.y - p2.y) + (p1.y - p2.y) * (p0.x - p2.x));
                 auto w2 = S_CONST_FLOAT(1.0) - w0 - w1;
-                auto color = (SVector3)c0 * w0 + (SVector3) c1 * w1 + (SVector3) c2 * w2;
+                auto color = (SVector3)c0 * w0 + (SVector3) c1 * w1 + (SVector3) c2 * w2;;
                 DrawPixel(frameBuffer, SVector2Int(x, y), (SNormColor3)color);
             }
         }
