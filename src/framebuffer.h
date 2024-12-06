@@ -15,6 +15,7 @@ struct FrameBuffer{
     unsigned width;
     unsigned height;
     unsigned char *buffer;
+    SFloat* depthBuffer;
 };
 
 FrameBuffer* CreateFrameBuffer(const unsigned width, const unsigned height);

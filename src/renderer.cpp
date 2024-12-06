@@ -24,6 +24,7 @@ SColor4 RandomColor(){
 
 
 Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMode renderMode):
+    width(width), height(height),
     background(0, 0, 0),
     window(window),
     frameBuffer(
@@ -96,6 +97,7 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
 
 
 Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMode renderMode, SByte r, SByte g, SByte b):
+    width(width), height(height),
     background(r, g, b),
     window(window),
     frameBuffer(
@@ -105,6 +107,7 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
 
 
 Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMode renderMode, SNormColor3 background):
+    width(width), height(height),
     background(background),
     window(window),
     frameBuffer(
@@ -114,6 +117,7 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
 
 
 Renderer::Renderer(unsigned int width, unsigned int height, GLFWwindow* window, RenderMode renderMode, SColor3 background):
+    width(width), height(height),
     background(NORMALIZE_COLOR_3(background)),
     window(window),
     frameBuffer(

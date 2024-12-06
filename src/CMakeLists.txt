@@ -21,9 +21,6 @@ add_executable(slab
         renderer.h
         framebuffer.cpp
         framebuffer.cpp
-        vertex.cpp
-        vertex.h
-        vertex.h
 )
 
 target_link_libraries(slab OpenGL::GL)
