@@ -6,10 +6,12 @@
 
 FrameBuffer* CreateFrameBuffer(const unsigned width, const unsigned height){
     auto *buffer = new unsigned char[width * height * 3]{0};
+    auto *depthBuffer = new SFloat[width * height]{0};
     auto *frameBuffer = new FrameBuffer{
             width,
             height,
-            buffer
+            buffer,
+            depthBuffer,
     };
     return frameBuffer;
 }
@@ -17,6 +19,7 @@ FrameBuffer* CreateFrameBuffer(const unsigned width, const unsigned height){
 
 void ReleaseFrameBuffer(FrameBuffer* frameBuffer){
     delete frameBuffer->buffer;
+    delete frameBuffer->depthBuffer;
     delete frameBuffer;
 }
 
@@ -45,6 +48,20 @@ inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNor
     frameBuffer->buffer[index] = color.r;
     frameBuffer->buffer[index + 1] = color.g;
     frameBuffer->buffer[index + 2] = color.b;
+}
+
+
+inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNormColor3& color, const SFloat depth){
+    if(
+            p.x < 0 || p.x >= frameBuffer->width || p.y < 0 || p.y >= frameBuffer->height
+    )
+        return;
+    auto index = (p.y * frameBuffer->width + p.x);
+    auto colorIndex = index * 3;
+    frameBuffer->buffer[index] = color.r;
+    frameBuffer->buffer[index + 1] = color.g;
+    frameBuffer->buffer[index + 2] = color.b;
+    frameBuffer->depthBuffer[index] = depth;
 }
 
 

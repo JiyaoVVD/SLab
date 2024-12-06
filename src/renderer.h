@@ -37,6 +37,8 @@ private:
     void drawLineLoopMode();
     void drawTriangleMode();
 private:
+    unsigned width, height;
+
     FrameBuffer* frameBuffer;
     GLFWwindow* window;
     SNormColor3 background;
@@ -47,6 +49,7 @@ private:
 
     std::vector<SVertex> vertexBuffer;
     std::vector<SIndex> indexBuffer;
+    SFragment* fragBuffer;
 };
 
 
