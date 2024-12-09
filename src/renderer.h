@@ -36,6 +36,12 @@ private:
     void drawLineMode();
     void drawLineLoopMode();
     void drawTriangleMode();
+    void rasterizeTriangle(
+        const SVertex& v0,
+        const SVertex& v1,
+        const SVertex& v2
+    );
+    inline SVertex processVertex(const SVertex& vertex);
 private:
     unsigned width, height;
 
@@ -49,7 +55,8 @@ private:
 
     std::vector<SVertex> vertexBuffer;
     std::vector<SIndex> indexBuffer;
-    SFragment* fragBuffer;
+
+    std::vector<SFragment> fragBuffer;
 };
 
 
