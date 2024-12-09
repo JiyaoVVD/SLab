@@ -22,7 +22,7 @@ FrameBuffer* CreateFrameBuffer(const unsigned width, const unsigned height);
 void ReleaseFrameBuffer(FrameBuffer* frameBuffer);
 void RenderFrameBuffer(const FrameBuffer* frameBuffer);
 void ClearFrameBuffer(FrameBuffer* frameBuffer, const SNormColor3& color);
-inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p1, const SNormColor3& color);
+inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNormColor3& color, SFloat depth);
 void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int& p1, const SNormColor3& c0, const SNormColor3& c1);
 void DrawTriangle(
         FrameBuffer *frameBuffer,

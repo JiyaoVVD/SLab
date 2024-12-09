@@ -1,6 +1,6 @@
 #ifndef SLAB_STYPE_H
 #define SLAB_STYPE_H
-
+#define GLM_FORCE_SWIZZLE
 #include <glm.hpp>
 #include <ext.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -46,7 +46,7 @@ struct SVertex{
 
 
 struct SFragment{
-    SVector2 coord;
+    SVector2Int coord;
     SVector3 normal;
     SColor4 color;
     SFloat depth;

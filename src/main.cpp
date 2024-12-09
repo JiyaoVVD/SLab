@@ -45,6 +45,7 @@ int main(){
 //    p = camera->projection() * p;
 //    PrintVector<4>(p);
 
+
     if(!glfwInit()){
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;

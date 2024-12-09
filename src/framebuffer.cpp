@@ -36,31 +36,35 @@ void ClearFrameBuffer(FrameBuffer* frameBuffer, const SNormColor3& color){
         *(frameBuffer->buffer + i * 3 + 1) = color.g;
         *(frameBuffer->buffer + i * 3 + 2) = color.b;
     }
+    memset(frameBuffer->depthBuffer, 0, sizeof(SFloat) * frameBuffer->width * frameBuffer->height);
 }
 
 
-inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNormColor3& color){
-    if(
-        p.x < 0 || p.x >= frameBuffer->width || p.y < 0 || p.y >= frameBuffer->height
-    )
-        return;
-    auto index = (p.y * frameBuffer->width + p.x) * 3;
-    frameBuffer->buffer[index] = color.r;
-    frameBuffer->buffer[index + 1] = color.g;
-    frameBuffer->buffer[index + 2] = color.b;
-}
+//inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNormColor3& color){
+//    if(
+//        p.x < 0 || p.x >= frameBuffer->width || p.y < 0 || p.y >= frameBuffer->height
+//    )
+//        return;
+//    auto index = (p.y * frameBuffer->width + p.x) * 3;
+//    frameBuffer->buffer[index] = color.r;
+//    frameBuffer->buffer[index + 1] = color.g;
+//    frameBuffer->buffer[index + 2] = color.b;
+//}
 
 
-inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNormColor3& color, const SFloat depth){
+inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNormColor3& color, SFloat depth){
     if(
             p.x < 0 || p.x >= frameBuffer->width || p.y < 0 || p.y >= frameBuffer->height
     )
         return;
     auto index = (p.y * frameBuffer->width + p.x);
+    if(frameBuffer->depthBuffer[index] > depth){
+        return;
+    }
     auto colorIndex = index * 3;
-    frameBuffer->buffer[index] = color.r;
-    frameBuffer->buffer[index + 1] = color.g;
-    frameBuffer->buffer[index + 2] = color.b;
+    frameBuffer->buffer[colorIndex] = color.r;
+    frameBuffer->buffer[colorIndex + 1] = color.g;
+    frameBuffer->buffer[colorIndex + 2] = color.b;
     frameBuffer->depthBuffer[index] = depth;
 }
 
@@ -77,7 +81,7 @@ void DrawLine(FrameBuffer *frameBuffer, const SVector2Int& p0, const SVector2Int
 
     while(true){
         auto color = glm::mix((SVector3)c0, (SVector3)c1, glm::length(SVector2(x0, y0) - (SVector2)p0) / len);
-        DrawPixel(frameBuffer, SVector2Int(x0, y0), color);
+        DrawPixel(frameBuffer, SVector2Int(x0, y0), color, 0);
         if(x0 == x1 && y0 == y1) break;
         int e2 = 2 * err;
         if(e2 > -dy){
@@ -126,7 +130,7 @@ void DrawTriangle(
                 auto w1 = (SFloat)(-(x - p2.x) * (p0.y - p2.y) + (y - p2.y) * (p0.x - p2.x)) / (-(p1.x - p2.x) * (p0.y - p2.y) + (p1.y - p2.y) * (p0.x - p2.x));
                 auto w2 = S_CONST_FLOAT(1.0) - w0 - w1;
                 auto color = (SVector3)c0 * w0 + (SVector3) c1 * w1 + (SVector3) c2 * w2;;
-                DrawPixel(frameBuffer, SVector2Int(x, y), (SNormColor3)color);
+                DrawPixel(frameBuffer, SVector2Int(x, y), (SNormColor3)color, 0);
             }
         }
     }
