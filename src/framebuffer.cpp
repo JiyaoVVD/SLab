@@ -58,9 +58,6 @@ inline void DrawPixel(FrameBuffer *frameBuffer, const SVector2Int& p, const SNor
     )
         return;
     auto index = (p.y * frameBuffer->width + p.x);
-    if(frameBuffer->depthBuffer[index] > depth){
-        return;
-    }
     auto colorIndex = index * 3;
     frameBuffer->buffer[colorIndex] = color.r;
     frameBuffer->buffer[colorIndex + 1] = color.g;
