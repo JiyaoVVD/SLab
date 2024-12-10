@@ -6,7 +6,7 @@
 
 #include <utility>
 #include <random>
-
+#include <oneapi/tbb/parallel_for.h>
 
 SColor4 RandomColor(){
     std::random_device rd;
@@ -155,6 +155,12 @@ Renderer::~Renderer(){
 }
 
 
+inline bool
+Renderer::depthTest(uint32_t x, uint32_t y, SFloat depth) const {
+     return depth > frameBuffer->depthBuffer[y * frameBuffer->width + x];
+}
+
+
 void
 Renderer::render(){
     assert(camera);
@@ -211,9 +217,11 @@ Renderer::rasterizeTriangle(
                 auto w1 = (SFloat) (-(x - p2.x) * (p0.y - p2.y) + (y - p2.y) * (p0.x - p2.x)) /
                           (-(p1.x - p2.x) * (p0.y - p2.y) + (p1.y - p2.y) * (p0.x - p2.x));
                 auto w2 = S_CONST_FLOAT(1.0) - w0 - w1;
+                auto depth = v0.position.z * w0 + v1.position.z * w1 + v2.position.z * w2;
+                if(!depthTest(x, y, depth))
+                    continue;
                 auto color = v0.color.rgb() * w0 + v1.color.rgb() * w1 + v2.color.rgb() * w2;
                 auto alpha = v0.color.a * w0 + v1.color.a * w1 + v2.color.a * w2;
-                auto depth = v0.position.z * w0 + v1.position.z * w1 + v2.position.z * w2;
                 fragBuffer.emplace_back(SFragment{
                         {x, y},
                         {normal},

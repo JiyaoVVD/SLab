@@ -42,6 +42,7 @@ private:
         const SVertex& v2
     );
     inline SVertex processVertex(const SVertex& vertex);
+    inline bool depthTest(uint32_t x, uint32_t y, SFloat depth) const;
 private:
     unsigned width, height;
 
