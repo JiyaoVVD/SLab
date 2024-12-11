@@ -5,6 +5,7 @@
 #ifndef SLAB_CAMERA_H
 #define SLAB_CAMERA_H
 
+#include <vector>
 #include "stype.h"
 #include "math_utils.h"
 
@@ -44,6 +45,8 @@ private:
 
     SMatrix4 orthoProjection(SFloat left, SFloat right, SFloat top, SFloat bottom, SFloat near, SFloat far);
     SMatrix4 persProjection(SFloat fov, SFloat aspect, SFloat near, SFloat far);
+
+    std::vector<SFragment> fragBuffer;
 };
 
 

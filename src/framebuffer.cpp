@@ -35,8 +35,9 @@ void ClearFrameBuffer(FrameBuffer* frameBuffer, const SNormColor3& color){
         *(frameBuffer->buffer + i * 3) = color.r;
         *(frameBuffer->buffer + i * 3 + 1) = color.g;
         *(frameBuffer->buffer + i * 3 + 2) = color.b;
+        *(frameBuffer->depthBuffer + i) = S_CONST_FLOAT(1000.0);
     }
-    memset(frameBuffer->depthBuffer, 0, sizeof(SFloat) * frameBuffer->width * frameBuffer->height);
+    // memset(frameBuffer->depthBuffer, 1000.0, sizeof(SFloat) * frameBuffer->width * frameBuffer->height);
 }
 
 
