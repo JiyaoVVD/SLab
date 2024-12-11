@@ -6,7 +6,7 @@
 
 #include <utility>
 #include <random>
-#include <oneapi/tbb/parallel_for.h>
+// #include <oneapi/tbb/parallel_for.h>
 
 SColor4 RandomColor(){
     std::random_device rd;
@@ -72,24 +72,44 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
             },
 
             {
-                    {S_CONST_FLOAT(-1.0), S_CONST_FLOAT(-1.0), S_CONST_FLOAT(-1.0)},
+                    {S_CONST_FLOAT(-0.25), S_CONST_FLOAT(-0.25), S_CONST_FLOAT(-0.25)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
                     RandomColor()
             },
             {
-                    {S_CONST_FLOAT(-1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(-1.0)},
+                    {S_CONST_FLOAT(-0.25), S_CONST_FLOAT(0.75), S_CONST_FLOAT(-0.25)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
             },
             {
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(1.0), S_CONST_FLOAT(-1.0)},
+                    {S_CONST_FLOAT(0.75), S_CONST_FLOAT(0.75), S_CONST_FLOAT(-0.25)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
             },
             {
-                    {S_CONST_FLOAT(1.0), S_CONST_FLOAT(-1.0), S_CONST_FLOAT(-1.0)},
+                    {S_CONST_FLOAT(0.75), S_CONST_FLOAT(-0.25), S_CONST_FLOAT(-0.25)},
                     {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
-                    RandomColor()
+                RandomColor()
+            },
+            {
+                    {S_CONST_FLOAT(-0.25), S_CONST_FLOAT(-0.25), S_CONST_FLOAT(0.75)},
+                    {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
+                RandomColor()
+            },
+            {
+                    {S_CONST_FLOAT(-0.25), S_CONST_FLOAT(0.75), S_CONST_FLOAT(0.75)},
+                    {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
+                RandomColor()
+            },
+            {
+                    {S_CONST_FLOAT(0.75), S_CONST_FLOAT(0.75), S_CONST_FLOAT(0.75)},
+                    {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
+                RandomColor()
+            },
+            {
+                    {S_CONST_FLOAT(0.75), S_CONST_FLOAT(-0.25), S_CONST_FLOAT(0.75)},
+                    {S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0)},
+                RandomColor()
             },
     };
     auto indices = new SIndex[]{
@@ -114,8 +134,23 @@ Renderer::Renderer(unsigned width, unsigned height, GLFWwindow* window, RenderMo
 
         10, 9, 8,
         11, 10, 8,
+        // back
+        12, 13, 14,
+        12, 14, 15,
+        // top
+        9, 14, 13,
+        9, 10, 14,
+        // bottom
+        8, 12, 11,
+        12, 15, 11,
+        // left
+        12, 8, 13,
+        8, 9, 13,
+        //right
+        11, 14, 10,
+        11, 15, 14,
     };
-    setVertices(testVertices, 12, indices, 42);
+    setVertices(testVertices, 16, indices, 72);
 }
 
 
@@ -157,7 +192,7 @@ Renderer::~Renderer(){
 
 inline bool
 Renderer::depthTest(uint32_t x, uint32_t y, SFloat depth) const {
-     return depth > frameBuffer->depthBuffer[y * frameBuffer->width + x];
+    return depth < frameBuffer->depthBuffer[y * frameBuffer->width + x];
 }
 
 
@@ -202,7 +237,9 @@ Renderer::rasterizeTriangle(
     auto normal = glm::normalize(v0.normal + v1.normal + v2.normal);
 
     for (int x = lx; x <= rx; ++x) {
+        if(x < 0 || x >= frameBuffer->width) continue;
         for (int y = ty; y <= by; ++y) {
+            if(y < 0 || y >= frameBuffer->height) continue;
             SVector2Int point(x, y);
 
             auto crs0 = icross2(p1 - p0, point - p0);
@@ -218,8 +255,6 @@ Renderer::rasterizeTriangle(
                           (-(p1.x - p2.x) * (p0.y - p2.y) + (p1.y - p2.y) * (p0.x - p2.x));
                 auto w2 = S_CONST_FLOAT(1.0) - w0 - w1;
                 auto depth = v0.position.z * w0 + v1.position.z * w1 + v2.position.z * w2;
-                if(!depthTest(x, y, depth))
-                    continue;
                 auto color = v0.color.rgb() * w0 + v1.color.rgb() * w1 + v2.color.rgb() * w2;
                 auto alpha = v0.color.a * w0 + v1.color.a * w1 + v2.color.a * w2;
                 fragBuffer.emplace_back(SFragment{
@@ -304,7 +339,7 @@ Renderer::processVertex(const SVertex &vertex) {
             {
                 (pNdc.x * (SFloat)frameBuffer->width) / 2 + (SFloat)frameBuffer->width / 2,
                 (pNdc.y * (SFloat)frameBuffer->height) / 2 + (SFloat)frameBuffer->height / 2,
-                S_CONST_FLOAT(1.0) / pNdc.z},
+                pNdc.z},
             {vertex.normal},
             {vertex.color},
     };
@@ -330,6 +365,8 @@ Renderer::drawTriangleMode() {
     }
 
     for(auto frag: fragBuffer){
+        if(!depthTest(frag.coord.x, frag.coord.y, frag.depth))
+            continue;
         DrawPixel(frameBuffer, frag.coord, NORMALIZE_COLOR_3(frag.color), frag.depth);
     }
 }

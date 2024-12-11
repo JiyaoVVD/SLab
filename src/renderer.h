@@ -32,6 +32,7 @@ public:
     void setVertices(SVertex* vertices, size_t numVertices);
     void setRenderMode(RenderMode renderMode);
     void setCamera(const Camera* camera);
+    
 private:
     void drawLineMode();
     void drawLineLoopMode();

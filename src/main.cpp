@@ -45,7 +45,6 @@ int main(){
 //    p = camera->projection() * p;
 //    PrintVector<4>(p);
 
-
     if(!glfwInit()){
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
@@ -70,7 +69,7 @@ int main(){
     auto deg = S_CONST_FLOAT(0.0), degY = S_CONST_FLOAT(45.0);
     SVector3 center(0);
     SVector3 newPos;
-    SFloat dist = S_CONST_FLOAT(3.0);
+    SFloat dist = S_CONST_FLOAT(2.0);
     SFloat deltaY = S_CONST_FLOAT(0.5);
     Renderer renderer(WIDTH, HEIGHT, window, Renderer::SLAB_TRIANGLE_MODE);
     auto camera = new Camera(SVector3(S_CONST_FLOAT(0.0), S_CONST_FLOAT(0.0), S_CONST_FLOAT(-4.0)), SVector3(0, 0, 0), SVector3(0, 1, 0));
