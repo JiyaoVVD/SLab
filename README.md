@@ -1,2 +1,2 @@
 # SLab
-a soft-renderer used for learning
+a soft-renderer for learning
